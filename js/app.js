@@ -402,6 +402,7 @@ window.setTab = function(tabName) {
   if (window.soundCtrl) window.soundCtrl.playClick();
   
   closeBottomSheet();
+  if (window.stopAllAppVideos) window.stopAllAppVideos();
 
   const tabButtons = document.querySelectorAll('[data-tab-nav]');
   tabButtons.forEach(btn => {
@@ -1567,8 +1568,72 @@ window.toggleStoreCard = function(itemId) {
   renderApp();
 };
 
+// --- Media Lifecycle Controller (Terminates all background audio/video immediately) ---
+function stopAllMediaInContainer(container) {
+  if (!container) return;
+  
+  // 1. Pause and reset all HTML5 video elements immediately
+  const videos = container.querySelectorAll('video');
+  videos.forEach(v => {
+    try {
+      v.pause();
+      v.muted = true;
+      v.currentTime = 0;
+      const sources = v.querySelectorAll('source');
+      sources.forEach(s => s.removeAttribute('src'));
+      v.removeAttribute('src');
+      v.load(); // Forces browser to detach the media pipeline & stop audio immediately
+    } catch (e) {
+      console.warn("Video stop exception", e);
+    }
+  });
+
+  // 2. Clear any active audio elements
+  const audios = container.querySelectorAll('audio');
+  audios.forEach(a => {
+    try {
+      a.pause();
+      a.currentTime = 0;
+      a.removeAttribute('src');
+      a.load();
+    } catch (e) {}
+  });
+
+  // 3. Clear and remove iframes (YouTube / video embeds)
+  const iframes = container.querySelectorAll('iframe');
+  iframes.forEach(iframe => {
+    try {
+      iframe.src = 'about:blank';
+      iframe.remove();
+    } catch (e) {}
+  });
+}
+
+window.stopAllAppVideos = function() {
+  const bottomSheet = document.getElementById('bottom-sheet-content');
+  if (bottomSheet) stopAllMediaInContainer(bottomSheet);
+
+  const uploadModal = document.getElementById('upload-modal-content');
+  if (uploadModal) stopAllMediaInContainer(uploadModal);
+  
+  // Scan document for any lingering playing videos
+  const allVideos = document.querySelectorAll('video');
+  allVideos.forEach(v => {
+    try {
+      v.pause();
+      v.muted = true;
+    } catch(e) {}
+  });
+};
+
 // --- Bottom Sheet Progressive Disclosure Overlay ---
 window.openBottomSheet = function(baseId) {
+  // First cleanly stop and detach any currently playing media
+  const existingContent = document.getElementById('bottom-sheet-content');
+  if (existingContent) {
+    stopAllMediaInContainer(existingContent);
+  }
+
   const base = COC_BASES.find(b => b.id === baseId) || COC_BASES[0];
   State.activeBottomSheet = base;
   if (window.soundCtrl) window.soundCtrl.playWhoosh();
@@ -1587,7 +1652,7 @@ window.openBottomSheet = function(baseId) {
         <span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-xs border border-emerald-500/30">
           ${base.th} • ${base.holdRate}
         </span>
-        <button onclick="closeBottomSheet()" class="p-1 rounded-full theme-muted hover:theme-title">
+        <button onclick="closeBottomSheet()" class="p-1 rounded-full theme-muted hover:theme-title" title="Close">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -1687,6 +1752,19 @@ window.openBottomSheet = function(baseId) {
 window.closeBottomSheet = function() {
   const backdrop = document.getElementById('bottom-sheet-backdrop');
   const container = document.getElementById('bottom-sheet-container');
+  const content = document.getElementById('bottom-sheet-content');
+
+  // 1. Immediately pause and mute all video and audio playback within 0ms
+  if (content) {
+    stopAllMediaInContainer(content);
+    // 2. Clear content after animation so it doesn't linger or re-play
+    setTimeout(() => {
+      if (!container || !container.classList.contains('active')) {
+        content.innerHTML = '';
+      }
+    }, 280);
+  }
+
   if (backdrop) backdrop.classList.remove('active');
   if (container) container.classList.remove('active');
   State.activeBottomSheet = null;
@@ -2411,6 +2489,12 @@ window.openUploadStudioModal = function(editBase = null) {
 window.closeUploadStudioModal = function() {
   const backdrop = document.getElementById('upload-modal-backdrop');
   const container = document.getElementById('upload-modal-container');
+  const content = document.getElementById('upload-modal-content');
+
+  if (content) {
+    stopAllMediaInContainer(content);
+  }
+
   if (backdrop) backdrop.classList.remove('active');
   if (container) container.classList.remove('active');
   State.editingBaseId = null;
@@ -2584,6 +2668,10 @@ window.attachSampleVideo = function() {
 };
 
 window.removeUploadedVideo = function() {
+  const videoPreviewArea = document.getElementById('upload-video-preview-area');
+  if (videoPreviewArea) {
+    stopAllMediaInContainer(videoPreviewArea);
+  }
   UploadState.selectedVideoBlobUrl = null;
   UploadState.selectedVideoName = null;
   const fileInput = document.getElementById('upload-video-file');
@@ -3124,6 +3212,8 @@ function setupGlobalListeners() {
       closeBottomSheet();
       closeUploadStudioModal();
       closeColeaderAuthModal();
+      closeWithdrawalModal();
+      if (window.stopAllAppVideos) window.stopAllAppVideos();
     }
   });
 }
