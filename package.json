@@ -1,0 +1,13 @@
+{
+  "name": "baselinkhub",
+  "version": "1.0.0",
+  "description": "BaseLinkHub - 1-Tap Clash of Clans Base Layout Links & Localized BD Digital Gaming Store",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["clash-of-clans", "base-layouts", "th16", "gaming-store", "bkash", "nagad"],
+  "author": "BaseLinkHub Team",
+  "license": "MIT"
+}

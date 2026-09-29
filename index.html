@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BaseLinkHub | Native Gaming Utility & Digital Store</title>
+  <meta name="description" content="Super smooth, frictionless multi-game utility platform and digital store. 1-Tap Clash of Clans base layouts & instant local top-ups.">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              emerald: '#10B981',
+              emeraldDark: '#059669',
+              amber: '#F59E0B',
+              blue: '#3B82F6',
+              bkash: '#E2136E',
+              nagad: '#F7941D'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Styles for App Experience -->
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="safe-pb-dock antialiased">
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- 1. Ultra-Minimalist Global Header -->
+  <header class="sticky top-0 z-40 w-full px-4 sm:px-6 h-14 flex items-center justify-between glass-panel border-b border-slate-200/80 dark:border-white/5 transition-colors">
+    <!-- Brand Logo -->
+    <a href="#" onclick="setTab('home')" class="flex items-center gap-2 group spring-press">
+      <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
+        <i data-lucide="shield" class="w-4 h-4 text-slate-950 stroke-[2.5]"></i>
+      </div>
+      <span class="text-lg font-black tracking-tight font-gaming theme-title">
+        BaseLink<span class="text-emerald-500">Hub</span>
+      </span>
+    </a>
+
+    <!-- Right Controls: Day/Night Theme Switcher & Profile Avatar -->
+    <div class="flex items-center gap-2">
+      
+      <!-- Day / Night Mode Switcher Button -->
+      <button onclick="toggleTheme()" 
+              id="theme-toggle-btn"
+              class="w-8 h-8 rounded-full theme-card-subtle border flex items-center justify-center theme-title spring-press transition-colors shadow-sm"
+              title="Toggle Day/Night Mode">
+        <i id="theme-toggle-icon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
+      </button>
+
+      <!-- Coleader Base Upload Button -->
+      <button onclick="openUploadStudioModal()" 
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs spring-press shadow-sm shadow-emerald-500/20"
+              title="Upload Base Blueprint">
+        <i data-lucide="upload-cloud" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+        <span class="hidden sm:inline">Upload Base</span>
+      </button>
+
+      <!-- Profile / Login Avatar -->
+      <button id="header-user-btn"
+              onclick="handleHeaderUserClick()" 
+              class="flex items-center gap-1.5 p-1 pl-2.5 rounded-full theme-card-subtle border spring-press text-xs font-bold theme-title shadow-sm"
+              title="Coleader Creator Verification">
+        <span id="header-user-label" class="hidden sm:inline text-[11px] font-semibold theme-muted">Coleader</span>
+        <div id="header-user-avatar" class="w-6 h-6 rounded-full bg-slate-700 text-slate-200 flex items-center justify-center text-[10px] font-black">
+          ?
+        </div>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- 2. Dynamic Main App Viewport (React-Ready Component Area) -->
+  <main id="app-main-content">
+    <!-- Injected dynamically via renderApp() in app.js -->
+  </main>
+
+  <!-- 3. App-Style Floating Bottom Navigation (Mobile First) -->
+  <nav class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-[460px] p-1.5 floating-bottom-nav flex items-center justify-between">
+    
+    <!-- Home Tab -->
+    <button data-tab-nav="home" 
+            onclick="setTab('home')" 
+            class="flex-1 py-2 rounded-full flex flex-col items-center gap-0.5 text-emerald-400 bg-emerald-500/15 spring-press transition-all">
+      <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+      <span class="text-[9px] sm:text-[10px] font-bold">Home</span>
+    </button>
+
+    <!-- CoC Bases Tab -->
+    <button data-tab-nav="coc" 
+            onclick="setTab('coc')" 
+            class="flex-1 py-2 rounded-full flex flex-col items-center gap-0.5 text-slate-400 spring-press transition-all">
+      <i data-lucide="shield" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+      <span class="text-[9px] sm:text-[10px] font-bold">CoC Bases</span>
+    </button>
+
+    <!-- Local Store Tab -->
+    <button data-tab-nav="store" 
+            onclick="setTab('store')" 
+            class="flex-1 py-2 rounded-full flex flex-col items-center gap-0.5 text-slate-400 spring-press transition-all">
+      <i data-lucide="shopping-bag" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+      <span class="text-[9px] sm:text-[10px] font-bold">Store</span>
+    </button>
+
+    <!-- Coleader Dashboard Tab -->
+    <button data-tab-nav="dashboard" 
+            onclick="setTab('dashboard')" 
+            class="flex-1 py-2 rounded-full flex flex-col items-center gap-0.5 text-slate-400 spring-press transition-all">
+      <i data-lucide="layout-dashboard" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+      <span class="text-[9px] sm:text-[10px] font-bold">Dashboard</span>
+    </button>
+
+    <!-- Menu / Settings Tab -->
+    <button data-tab-nav="menu" 
+            onclick="setTab('menu')" 
+            class="flex-1 py-2 rounded-full flex flex-col items-center gap-0.5 text-slate-400 spring-press transition-all">
+      <i data-lucide="menu" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+      <span class="text-[9px] sm:text-[10px] font-bold">Menu</span>
+    </button>
+
+  </nav>
+
+  <!-- 4. Progressive Disclosure Bottom Sheet Overlay -->
+  <div id="bottom-sheet-backdrop" class="bottom-sheet-backdrop" onclick="closeBottomSheet()"></div>
+  <div id="bottom-sheet-container" class="bottom-sheet-container">
+    <div class="sheet-drag-handle"></div>
+    <div id="bottom-sheet-content">
+      <!-- Injected dynamically via openBottomSheet(baseId) -->
+    </div>
+  </div>
+
+  <!-- 5. Coleader Creator Upload Studio Modal -->
+  <div id="upload-modal-backdrop" class="upload-modal-backdrop" onclick="closeUploadStudioModal()"></div>
+  <div id="upload-modal-container" class="upload-modal-container">
+    <div id="upload-modal-content" class="flex flex-col h-full max-h-[90vh] overflow-hidden">
+      <!-- Injected dynamically via openUploadStudioModal() in app.js -->
+    </div>
+  </div>
+
+  <!-- 6. Coleader Security Verification Modal -->
+  <div id="auth-modal-backdrop" class="upload-modal-backdrop" onclick="closeColeaderAuthModal()"></div>
+  <div id="auth-modal-container" class="upload-modal-container">
+    <div id="auth-modal-content" class="flex flex-col h-full max-h-[90vh] overflow-hidden">
+      <!-- Injected dynamically via openColeaderAuthModal() in app.js -->
+    </div>
+  </div>
+
+  <!-- 7. Coleader MFS Earnings Withdrawal Modal -->
+  <div id="withdraw-modal-backdrop" class="upload-modal-backdrop" onclick="closeWithdrawalModal()"></div>
+  <div id="withdraw-modal-container" class="upload-modal-container">
+    <div id="withdraw-modal-content" class="flex flex-col h-full max-h-[90vh] overflow-hidden">
+      <!-- Injected dynamically via openWithdrawalModal() in app.js -->
+    </div>
+  </div>
+
+  <!-- Audio Controller & App Script -->
+  <script src="js/audio.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>

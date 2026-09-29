@@ -1,0 +1,433 @@
+/* BaseLinkHub - Native Mobile-App Experience Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap');
+
+:root {
+  --bg-app: #030712;
+  --bg-surface: #0b1120;
+  --bg-surface-elevated: #111827;
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-subtle: #1e293b;
+  --text-title: #ffffff;
+  --text-body: #94a3b8;
+  --text-muted: #64748b;
+  --emerald-neon: #10b981;
+  --blue-neon: #3b82f6;
+  --amber-neon: #f59e0b;
+  --bkash: #e2136e;
+  --nagad: #f7941d;
+  --bottom-bar-bg: rgba(11, 17, 32, 0.88);
+  --sheet-bg: #0b1120;
+  --card-bg: rgba(15, 23, 42, 0.85);
+  --card-subtle-bg: rgba(3, 7, 18, 0.6);
+  --pill-inactive-bg: rgba(15, 23, 42, 0.9);
+  --pill-inactive-text: #cbd5e1;
+  --pill-inactive-border: rgba(255, 255, 255, 0.1);
+  --input-bg: #030712;
+}
+
+/* Refined Light Theme (Calm Slate Background, Pure White Elevated Cards) */
+html.light {
+  --bg-app: #f1f5f9; /* Soft, calm slate neutral that eliminates glaring white-on-white */
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #ffffff;
+  --border-glass: rgba(15, 23, 42, 0.08);
+  --border-subtle: #e2e8f0;
+  --text-title: #0f172a;
+  --text-body: #334155;
+  --text-muted: #64748b;
+  --bottom-bar-bg: rgba(255, 255, 255, 0.95);
+  --sheet-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-subtle-bg: #f8fafc;
+  --pill-inactive-bg: #ffffff;
+  --pill-inactive-text: #334155;
+  --pill-inactive-border: #cbd5e1;
+  --input-bg: #ffffff;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-body);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Multi-Dimensional Ambient Canvas (Eliminates flat empty voids on desktop) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+html.dark body::before {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Atmospheric Ambient Color Auras (Soft Emerald, Blue, Amber Glows) */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: 
+    radial-gradient(circle 600px at 0% 15%, rgba(16, 185, 129, 0.07), transparent 70%),
+    radial-gradient(circle 700px at 100% 20%, rgba(59, 130, 246, 0.06), transparent 70%),
+    radial-gradient(circle 500px at 50% 85%, rgba(245, 158, 11, 0.05), transparent 70%);
+}
+
+html.dark body::after {
+  background: 
+    radial-gradient(circle 600px at 0% 15%, rgba(16, 185, 129, 0.12), transparent 70%),
+    radial-gradient(circle 700px at 100% 20%, rgba(59, 130, 246, 0.09), transparent 70%),
+    radial-gradient(circle 500px at 50% 85%, rgba(245, 158, 11, 0.07), transparent 70%);
+}
+
+.font-gaming {
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.04em;
+}
+
+/* Text Theme Utilities */
+.theme-title {
+  color: var(--text-title) !important;
+}
+.theme-body {
+  color: var(--text-body) !important;
+}
+.theme-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Theme Adaptive Containers */
+.theme-card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-subtle) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
+}
+
+html.light .theme-card {
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.07);
+}
+
+.theme-card-subtle {
+  background-color: var(--card-subtle-bg) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+.theme-pill-inactive {
+  background-color: var(--pill-inactive-bg) !important;
+  color: var(--pill-inactive-text) !important;
+  border-color: var(--pill-inactive-border) !important;
+}
+
+.theme-pill-inactive:hover {
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+}
+
+.theme-pill-active {
+  background-color: #10b981 !important;
+  color: #022c22 !important;
+  border-color: #10b981 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.theme-input {
+  background-color: var(--input-bg) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--text-title) !important;
+}
+
+/* Dedicated Multi-Game Carousel Cards (Auto-adaptive for Day & Night) */
+.game-card-coc {
+  background: linear-gradient(145deg, rgba(6, 78, 59, 0.45) 0%, rgba(15, 23, 42, 0.95) 75%) !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(16, 185, 129, 0.2);
+}
+html.light .game-card-coc {
+  background: #ffffff !important;
+  border: 1px solid #d1fae5 !important;
+  border-top: 4px solid #10b981 !important;
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+.game-card-pubg {
+  background: linear-gradient(145deg, rgba(120, 53, 15, 0.45) 0%, rgba(15, 23, 42, 0.95) 75%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(245, 158, 11, 0.2);
+}
+html.light .game-card-pubg {
+  background: #ffffff !important;
+  border: 1px solid #fef3c7 !important;
+  border-top: 4px solid #f59e0b !important;
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+.game-card-freefire {
+  background: linear-gradient(145deg, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.95) 75%) !important;
+  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(59, 130, 246, 0.2);
+}
+html.light .game-card-freefire {
+  background: #ffffff !important;
+  border: 1px solid #dbeafe !important;
+  border-top: 4px solid #3b82f6 !important;
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+}
+
+html.light .glass-panel {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
+}
+
+/* Floating Bottom Navigation Dock */
+.floating-bottom-nav {
+  background: var(--bottom-bar-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+  border-radius: 9999px;
+}
+
+html.light .floating-bottom-nav {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.16), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Spring physics active scale */
+.spring-press {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+}
+.spring-press:active {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+/* 1-Tap Copy Shimmer & Glow */
+.btn-1tap {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.45);
+}
+
+.btn-1tap::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 35%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    rgba(255, 255, 255, 0) 10%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  transform: rotate(25deg);
+  animation: shimmer-swipe 3.2s infinite;
+  pointer-events: none;
+}
+
+@keyframes shimmer-swipe {
+  0% { left: -60%; }
+  25% { left: 140%; }
+  100% { left: 140%; }
+}
+
+/* Bottom Sheet Overlay & Drawer */
+.bottom-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+}
+
+.bottom-sheet-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bottom-sheet-container {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 580px;
+  margin: 0 auto;
+  background: var(--sheet-bg);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.35);
+  z-index: 101;
+  transform: translateY(105%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.bottom-sheet-container.active {
+  transform: translateY(0);
+}
+
+.sheet-drag-handle {
+  width: 42px;
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(156, 163, 175, 0.35);
+  margin: 12px auto 6px;
+  cursor: grab;
+}
+
+/* Card in-place expansion animation */
+.expandable-content {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.expandable-content.expanded {
+  max-height: 480px;
+  opacity: 1;
+}
+
+/* Desktop Segmented Tab Control (No awkward horizontal pills on desktop!) */
+.desktop-filter-dock {
+  background: var(--card-subtle-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 4px;
+}
+
+/* Smooth horizontal carousel snap */
+.snap-carousel {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.snap-card {
+  scroll-snap-align: start;
+}
+
+/* View transitions */
+.app-view {
+  animation: viewFadeSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes viewFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Confetti canvas */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 99999;
+}
+
+/* Safe area for floating bottom nav */
+.safe-pb-dock {
+  padding-bottom: 6.5rem;
+}
+
+/* Scrollbar Hide for native feel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Coleader Upload Studio Modal */
+.upload-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 110;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.upload-modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.upload-modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%) scale(0.96);
+  width: 94%;
+  max-width: 620px;
+  max-height: 90vh;
+  background: var(--sheet-bg);
+  border: 1px solid var(--border-glass);
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  z-index: 111;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.upload-modal-container.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+/* Image preview drag & drop area */
+.upload-dropzone {
+  border: 2px dashed var(--border-subtle);
+  transition: all 0.2s ease;
+}
+.upload-dropzone:hover, .upload-dropzone.dragover {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+
