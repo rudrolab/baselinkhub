@@ -54,7 +54,7 @@
       </span>
     </a>
 
-    <!-- Right Controls: Day/Night Theme Switcher & Profile Avatar -->
+    <!-- Right Controls: Day/Night Theme Switcher & Settings -->
     <div class="flex items-center gap-2">
       
       <!-- Day / Night Mode Switcher Button -->
@@ -65,23 +65,11 @@
         <i id="theme-toggle-icon" data-lucide="sun" class="w-4 h-4 text-amber-400"></i>
       </button>
 
-      <!-- Coleader Base Upload Button -->
-      <button onclick="openUploadStudioModal()" 
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs spring-press shadow-sm shadow-emerald-500/20"
-              title="Upload Base Blueprint">
-        <i data-lucide="upload-cloud" class="w-3.5 h-3.5 stroke-[2.5]"></i>
-        <span class="hidden sm:inline">Upload Base</span>
-      </button>
-
-      <!-- Profile / Login Avatar -->
-      <button id="header-user-btn"
-              onclick="handleHeaderUserClick()" 
-              class="flex items-center gap-1.5 p-1 pl-2.5 rounded-full theme-card-subtle border spring-press text-xs font-bold theme-title shadow-sm"
-              title="Coleader Creator Verification">
-        <span id="header-user-label" class="hidden sm:inline text-[11px] font-semibold theme-muted">Coleader</span>
-        <div id="header-user-avatar" class="w-6 h-6 rounded-full bg-slate-700 text-slate-200 flex items-center justify-center text-[10px] font-black">
-          ?
-        </div>
+      <!-- Quick Platform Settings / Menu Shortcut -->
+      <button onclick="setTab('menu')" 
+              class="w-8 h-8 rounded-full theme-card-subtle border flex items-center justify-center theme-muted hover:theme-title spring-press transition-colors shadow-sm"
+              title="Platform Menu & Settings">
+        <i data-lucide="settings" class="w-4 h-4"></i>
       </button>
 
     </div>

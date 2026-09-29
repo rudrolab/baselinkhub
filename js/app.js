@@ -621,34 +621,6 @@ function renderCoCHubView(container) {
         </div>
       </div>
 
-      <!-- Coleader Base Upload Creator Banner -->
-      <div class="mb-6 p-4 rounded-3xl theme-card border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-gradient-to-r from-emerald-500/10 via-transparent to-teal-500/10 shadow-sm">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/40 shadow-sm">
-            <i data-lucide="upload-cloud" class="w-5 h-5 stroke-[2.5]"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-black theme-title font-gaming">Are you a Clan Leader / Co-Leader?</span>
-              <span class="text-[9px] font-black uppercase text-amber-600 dark:text-amber-400 bg-amber-500/15 px-1.5 py-0.5 rounded border border-amber-500/30">
-                70% Rev-Share
-              </span>
-            </div>
-            <p class="text-[11px] theme-body">Manage blueprints, track video defense proof, and copy clan war links.</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 shrink-0 flex-wrap">
-          <button onclick="setTab('dashboard')" class="px-3.5 py-2 rounded-2xl theme-card-subtle border border-emerald-500/40 hover:bg-emerald-500/10 theme-title font-bold text-xs spring-press flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-emerald-500"></i>
-            <span>Coleader Dashboard</span>
-          </button>
-          <button onclick="openUploadStudioModal()" class="px-3.5 py-2 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider spring-press shadow-md shadow-emerald-500/20 flex items-center gap-1.5">
-            <i data-lucide="plus-circle" class="w-3.5 h-3.5 stroke-[2.5]"></i>
-            <span>Upload Base</span>
-          </button>
-        </div>
-      </div>
-
       <!-- DESKTOP FILTERING CONTROL DOCK (Clean, High-End Segmented Layout without horizontal pill scrolling!) -->
       <div class="hidden md:flex items-center justify-between gap-2 desktop-filter-dock mb-7">
         <div class="flex items-center gap-1">
@@ -2701,6 +2673,59 @@ window.handlePublishBase = function(event) {
   // Real playable video source
   const videoUrl = UploadState.selectedVideoBlobUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
 
+  // Check if we are editing an existing blueprint
+  if (State.editingBaseId) {
+    const existing = COC_BASES.find(b => b.id === State.editingBaseId);
+    if (existing) {
+      existing.title = title;
+      existing.link = link;
+      existing.th = th;
+      existing.category = category;
+      existing.holdRate = holdRate;
+      existing.ccTroops = ccTroops;
+      existing.trapSecrets = trapSecrets;
+      if (UploadState.selectedImageBase64) existing.imageUrl = UploadState.selectedImageBase64;
+      if (existing.videoProof) {
+        existing.videoProof.videoUrl = videoUrl;
+        existing.videoProof.attacker = attacker;
+        existing.videoProof.hold = holdResult;
+        existing.videoProof.trophies = trophies;
+        existing.videoProof.time = (document.getElementById('upload-time')?.value.trim()) || '2m 48s';
+      } else {
+        existing.videoProof = {
+          trophies: trophies,
+          attacker: attacker,
+          hold: holdResult,
+          time: '2m 48s',
+          videoUrl: videoUrl
+        };
+      }
+
+      // Persist update if custom
+      try {
+        const raw = localStorage.getItem(SAVED_BASES_KEY);
+        if (raw) {
+          const list = JSON.parse(raw);
+          const idx = list.findIndex(b => b.id === State.editingBaseId);
+          if (idx !== -1) {
+            list[idx] = existing;
+            localStorage.setItem(SAVED_BASES_KEY, JSON.stringify(list));
+          }
+        }
+      } catch (err) {
+        console.warn("Storage update error", err);
+      }
+
+      if (window.soundCtrl) window.soundCtrl.playCopySuccess();
+      closeUploadStudioModal();
+      State.editingBaseId = null;
+
+      showToastNotification("Blueprint Updated!", `"${title}" was saved with updated layout metadata.`);
+      renderApp();
+      return;
+    }
+  }
+
   const newBase = {
     id: 'custom-' + Date.now(),
     th: th,
@@ -2768,6 +2793,284 @@ window.handlePublishBase = function(event) {
     "Blueprint Published!",
     `"${title}" is now live with playable video defense proof & 1-Tap Copy!`
   );
+};
+
+// --- Coleader Dashboard Handlers ---
+window.handleDashboardFilter = function(filterKey) {
+  State.dashboardFilter = filterKey;
+  if (window.soundCtrl) window.soundCtrl.playClick();
+  const main = document.getElementById('app-main-content');
+  if (main && State.currentTab === 'dashboard') {
+    renderColeaderDashboardView(main);
+    if (window.lucide) window.lucide.createIcons();
+  }
+};
+
+window.handleDashboardSearch = function(val) {
+  State.dashboardSearch = (val || '').trim();
+  const main = document.getElementById('app-main-content');
+  if (main && State.currentTab === 'dashboard') {
+    renderColeaderDashboardView(main);
+    if (window.lucide) window.lucide.createIcons();
+    const input = document.getElementById('dashboard-search-input');
+    if (input) {
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  }
+};
+
+window.handleEditBase = function(baseId) {
+  const base = COC_BASES.find(b => b.id === baseId);
+  if (!base) return;
+  openUploadStudioModal(base);
+};
+
+window.handleToggleBaseStatus = function(baseId) {
+  const base = COC_BASES.find(b => b.id === baseId);
+  if (!base) return;
+  base.isArchived = !base.isArchived;
+
+  // Persist if custom
+  try {
+    const raw = localStorage.getItem(SAVED_BASES_KEY);
+    if (raw) {
+      const list = JSON.parse(raw);
+      const idx = list.findIndex(b => b.id === baseId);
+      if (idx !== -1) {
+        list[idx].isArchived = base.isArchived;
+        localStorage.setItem(SAVED_BASES_KEY, JSON.stringify(list));
+      }
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+
+  if (window.soundCtrl) window.soundCtrl.playClick();
+  showToastNotification(
+    base.isArchived ? "Layout Archived" : "Layout Reactivated",
+    base.isArchived 
+      ? `"${base.title}" is archived from public feed (internal clan view only).` 
+      : `"${base.title}" is now active and visible in the public feed.`
+  );
+
+  const main = document.getElementById('app-main-content');
+  if (main && State.currentTab === 'dashboard') {
+    renderColeaderDashboardView(main);
+    if (window.lucide) window.lucide.createIcons();
+  }
+};
+
+window.handleDeleteBase = function(baseId) {
+  const base = COC_BASES.find(b => b.id === baseId);
+  if (!base) return;
+
+  const confirmed = confirm(`Are you sure you want to delete "${base.title}" from your clan blueprints?`);
+  if (!confirmed) return;
+
+  const idx = COC_BASES.findIndex(b => b.id === baseId);
+  if (idx !== -1) {
+    COC_BASES.splice(idx, 1);
+  }
+
+  // Remove from localStorage
+  try {
+    const raw = localStorage.getItem(SAVED_BASES_KEY);
+    if (raw) {
+      const list = JSON.parse(raw);
+      const filtered = list.filter(b => b.id !== baseId);
+      localStorage.setItem(SAVED_BASES_KEY, JSON.stringify(filtered));
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+
+  if (window.soundCtrl) window.soundCtrl.playClick();
+  showToastNotification("Blueprint Deleted", `"${base.title}" was removed from your clan management deck.`);
+
+  const main = document.getElementById('app-main-content');
+  if (main && State.currentTab === 'dashboard') {
+    renderColeaderDashboardView(main);
+    if (window.lucide) window.lucide.createIcons();
+  }
+};
+
+window.handleCopyClanShareMessage = function(baseId) {
+  const base = COC_BASES.find(b => b.id === baseId);
+  if (!base) return;
+
+  const msg = `🛡️ [CLAN WAR BLUEPRINT] ${base.title} (${base.th})\n` +
+              `⭐ Anti-3★ Hold Rate: ${base.holdRate}\n` +
+              `🎥 Playable Defense Replay: ${base.videoProof ? base.videoProof.hold : 'Tournament Tested'}\n` +
+              `🏰 Clan Castle: ${base.ccTroops || '2x Ice Golem, 1x Super Minion'}\n` +
+              `🔗 Official Supercell Copy Link: ${base.link}\n` +
+              `Verified by Co-Leader ${base.author}`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(msg).then(() => {
+      if (window.soundCtrl) window.soundCtrl.playCopySuccess();
+      showToastNotification("Clan Share Link Copied!", "Formatted war announcement copied to clipboard for Discord / WhatsApp.");
+    }).catch(() => {
+      fallbackCopy(msg);
+    });
+  } else {
+    fallbackCopy(msg);
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    if (window.soundCtrl) window.soundCtrl.playCopySuccess();
+    showToastNotification("Clan Share Link Copied!", "Formatted war announcement copied to clipboard.");
+  }
+};
+
+// --- MFS Earnings Withdrawal Modal Controller ---
+window.openWithdrawalModal = function() {
+  if (window.soundCtrl) window.soundCtrl.playClick();
+  const backdrop = document.getElementById('withdraw-modal-backdrop');
+  const container = document.getElementById('withdraw-modal-container');
+  const content = document.getElementById('withdraw-modal-content');
+  if (!backdrop || !container || !content) return;
+
+  content.innerHTML = `
+    <!-- Withdrawal Header -->
+    <div class="px-5 py-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between shrink-0 theme-card-subtle">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center border border-emerald-500/30">
+          <i data-lucide="wallet" class="w-5 h-5 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-base font-black theme-title font-gaming">Instant MFS Payout</h2>
+            <span class="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+              0% Fee
+            </span>
+          </div>
+          <p class="text-[11px] theme-muted">70% Creator Revenue Share Direct Cash-Out</p>
+        </div>
+      </div>
+      <button onclick="closeWithdrawalModal()" class="w-8 h-8 rounded-full theme-card border flex items-center justify-center theme-muted hover:theme-title spring-press">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Withdrawal Form -->
+    <form onsubmit="handleConfirmWithdrawal(event)" class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
+      
+      <!-- Current Balance Notice -->
+      <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+        <div>
+          <div class="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400">Available Creator Balance</div>
+          <div class="text-xl font-black theme-title font-mono">৳${State.coleaderEarningsBDT.toLocaleString()} BDT</div>
+        </div>
+        <span class="text-[10px] font-bold text-slate-400 font-mono">Min: ৳500</span>
+      </div>
+
+      <!-- Payment Method Selection -->
+      <div>
+        <label class="font-bold theme-title block mb-1 text-[11px]">Select Mobile Financial Service</label>
+        <div class="grid grid-cols-3 gap-2">
+          <label class="p-3 rounded-xl theme-card border flex flex-col items-center justify-center cursor-pointer hover:border-pink-500 transition-colors">
+            <input type="radio" name="withdrawMethod" value="bKash" checked class="hidden peer">
+            <span class="font-black text-pink-600 text-xs peer-checked:scale-105">bKash</span>
+            <span class="text-[9px] theme-muted mt-0.5">Personal</span>
+          </label>
+          <label class="p-3 rounded-xl theme-card border flex flex-col items-center justify-center cursor-pointer hover:border-orange-500 transition-colors">
+            <input type="radio" name="withdrawMethod" value="Nagad" class="hidden peer">
+            <span class="font-black text-orange-600 text-xs peer-checked:scale-105">Nagad</span>
+            <span class="text-[9px] theme-muted mt-0.5">Wallet</span>
+          </label>
+          <label class="p-3 rounded-xl theme-card border flex flex-col items-center justify-center cursor-pointer hover:border-purple-500 transition-colors">
+            <input type="radio" name="withdrawMethod" value="Rocket" class="hidden peer">
+            <span class="font-black text-purple-600 text-xs peer-checked:scale-105">Rocket</span>
+            <span class="text-[9px] theme-muted mt-0.5">DBBL</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Phone Number -->
+      <div>
+        <label class="font-bold theme-title block mb-1 text-[11px]">MFS Account Number</label>
+        <input id="withdraw-phone" type="tel" placeholder="017XXXXXXXX" value="01712345678" required class="w-full px-3 py-2 rounded-xl theme-input border font-mono text-xs focus:outline-none focus:border-emerald-500">
+      </div>
+
+      <!-- Amount -->
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="font-bold theme-title block text-[11px]">Withdrawal Amount (BDT)</label>
+          <button type="button" onclick="document.getElementById('withdraw-amount').value = ${State.coleaderEarningsBDT}" class="text-[10px] font-bold text-emerald-500 hover:underline">
+            Max All (৳${State.coleaderEarningsBDT})
+          </button>
+        </div>
+        <input id="withdraw-amount" type="number" min="500" max="${State.coleaderEarningsBDT}" value="${State.coleaderEarningsBDT}" required class="w-full px-3 py-2 rounded-xl theme-input border font-mono text-xs font-bold focus:outline-none focus:border-emerald-500">
+      </div>
+
+      <!-- Supercell Token Check -->
+      <div class="p-3 rounded-xl theme-card-subtle border text-[11px] theme-muted flex items-start gap-2">
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i>
+        <span>Payout authorized for verified leader <strong>${State.currentUser ? State.currentUser.name : 'Chief Klaus'}</strong>. Dispatched in 2-5 minutes via Bangladesh MFS gateway.</span>
+      </div>
+
+      <button type="submit" class="w-full py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 spring-press shadow-lg shadow-emerald-500/20">
+        <i data-lucide="check-circle" class="w-4 h-4 stroke-[3]"></i>
+        <span>Confirm Instant Payout</span>
+      </button>
+
+    </form>
+  `;
+
+  backdrop.classList.add('active');
+  container.classList.add('active');
+  if (window.lucide) window.lucide.createIcons();
+};
+
+window.closeWithdrawalModal = function() {
+  const backdrop = document.getElementById('withdraw-modal-backdrop');
+  const container = document.getElementById('withdraw-modal-container');
+  if (backdrop) backdrop.classList.remove('active');
+  if (container) container.classList.remove('active');
+};
+
+window.handleConfirmWithdrawal = function(event) {
+  if (event) event.preventDefault();
+  const phone = document.getElementById('withdraw-phone').value.trim();
+  const amount = parseInt(document.getElementById('withdraw-amount').value, 10);
+  const methodRadio = document.querySelector('input[name="withdrawMethod"]:checked');
+  const method = methodRadio ? methodRadio.value : 'bKash';
+
+  if (!phone || isNaN(amount) || amount <= 0) {
+    showToastNotification("Invalid Input", "Please provide a valid account number and amount.");
+    return;
+  }
+
+  if (amount > State.coleaderEarningsBDT) {
+    showToastNotification("Insufficient Balance", `Maximum withdrawable balance is ৳${State.coleaderEarningsBDT}.`);
+    return;
+  }
+
+  // Deduct
+  State.coleaderEarningsBDT -= amount;
+  localStorage.setItem('blh_coleader_earnings', State.coleaderEarningsBDT.toString());
+
+  closeWithdrawalModal();
+  if (window.soundCtrl) window.soundCtrl.playCoin();
+  if (window.confetti) window.confetti.fire();
+
+  showToastNotification(
+    "Payout Initiated!",
+    `৳${amount.toLocaleString()} BDT sent to ${method} account ${phone}. Reference: CLAN-${Date.now().toString().slice(-6)}`
+  );
+
+  const main = document.getElementById('app-main-content');
+  if (main && State.currentTab === 'dashboard') {
+    renderColeaderDashboardView(main);
+    if (window.lucide) window.lucide.createIcons();
+  }
 };
 
 // --- Toast Notification ---
