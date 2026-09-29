@@ -90,6 +90,7 @@ const GAMES = [
     borderDark: "border-emerald-500/40",
     borderLight: "border-emerald-200",
     icon: "shield",
+    logoImage: "images/coc-logo.jpg",
     itemsCount: "48k+ Bases",
     accent: "#10b981"
   },
@@ -104,6 +105,7 @@ const GAMES = [
     borderDark: "border-amber-500/40",
     borderLight: "border-amber-200",
     icon: "crosshair",
+    logoImage: "images/pubg-logo.jpg",
     itemsCount: "Instant UC",
     accent: "#f59e0b"
   },
@@ -118,6 +120,7 @@ const GAMES = [
     borderDark: "border-blue-500/40",
     borderLight: "border-blue-200",
     icon: "flame",
+    logoImage: "images/freefire-logo.webp",
     itemsCount: "Diamonds 24/7",
     accent: "#3b82f6"
   }
@@ -487,8 +490,8 @@ function renderHomeView(container) {
                    class="snap-card min-w-[270px] md:min-w-0 rounded-3xl p-5 sm:p-6 game-card-${g.id} cursor-pointer spring-press relative overflow-hidden flex flex-col justify-between group shadow-lg">
                 <div>
                   <div class="flex items-center justify-between mb-4">
-                    <div class="w-10 h-10 rounded-2xl ${iconBg} border flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                      <i data-lucide="${g.icon}" class="w-5 h-5"></i>
+                    <div class="w-12 h-12 rounded-2xl overflow-hidden border border-slate-300 dark:border-white/10 shadow-md group-hover:scale-105 transition-transform shrink-0 bg-slate-900 flex items-center justify-center">
+                      <img src="${g.logoImage}" alt="${g.name} Logo" class="w-full h-full object-cover">
                     </div>
                     <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${badgeBg}">
                       ${g.badge}
@@ -514,17 +517,22 @@ function renderHomeView(container) {
       <!-- Quick Action Cards: Clash of Clans Highlight -->
       <div class="rounded-3xl p-6 theme-card border border-emerald-500/30 mb-8 relative overflow-hidden">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-gaming">CWL Season Rotation Live</span>
+          <div class="flex items-start sm:items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl overflow-hidden border border-emerald-500/40 shadow-lg shrink-0 hidden sm:block bg-slate-900">
+              <img src="images/coc-logo.jpg" alt="Clash of Clans" class="w-full h-full object-cover">
             </div>
-            <h2 class="text-xl sm:text-2xl font-black theme-title font-gaming mb-1">
-              Clash of Clans Pro Hub
-            </h2>
-            <p class="text-xs sm:text-sm theme-body max-w-md">
-              1-Tap copy meta-tested TH16 anti-3-star war blueprints and Dark Elixir farming vaults.
-            </p>
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-gaming">CWL Season Rotation Live</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black theme-title font-gaming mb-1">
+                Clash of Clans Pro Hub
+              </h2>
+              <p class="text-xs sm:text-sm theme-body max-w-md">
+                1-Tap copy meta-tested TH16 anti-3-star war blueprints and Dark Elixir farming vaults.
+              </p>
+            </div>
           </div>
           <button onclick="setTab('coc')" 
                   class="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider shrink-0 spring-press shadow-lg shadow-emerald-500/20">
@@ -591,11 +599,16 @@ function renderCoCHubView(container) {
 
       <!-- Hub Header Title & Town Hall Pill -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <div>
-          <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block font-gaming">
-            GAME HUB • STRATEGY & WAR BASES
-          </span>
-          <h1 class="text-2xl sm:text-3xl font-black theme-title font-gaming">Clash of Clans Blueprints</h1>
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl overflow-hidden border border-emerald-500/40 shadow-sm shrink-0 bg-slate-900">
+            <img src="images/coc-logo.jpg" alt="Clash of Clans" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block font-gaming">
+              GAME HUB • STRATEGY & WAR BASES
+            </span>
+            <h1 class="text-2xl sm:text-3xl font-black theme-title font-gaming">Clash of Clans Blueprints</h1>
+          </div>
         </div>
 
         <!-- Town Hall Fast Filter Toggle -->
@@ -789,9 +802,9 @@ function renderStoreView(container) {
   });
 
   const storeTabs = [
-    { id: 'coc', label: 'Clash of Clans' },
-    { id: 'pubg', label: 'PUBG Mobile' },
-    { id: 'freefire', label: 'Free Fire' },
+    { id: 'coc', label: 'Clash of Clans', iconImg: 'images/coc-logo.jpg' },
+    { id: 'pubg', label: 'PUBG Mobile', iconImg: 'images/pubg-logo.jpg' },
+    { id: 'freefire', label: 'Free Fire', iconImg: 'images/freefire-logo.webp' },
     { id: 'all', label: 'All Items' }
   ];
 
@@ -819,12 +832,13 @@ function renderStoreView(container) {
           const isActive = State.storeFilter === tab.id;
           return `
             <button onclick="setStoreFilter('${tab.id}')"
-                    class="px-4 py-2 rounded-xl text-xs font-bold transition-all spring-press ${
+                    class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all spring-press flex items-center gap-2 ${
                       isActive 
                         ? 'theme-pill-active' 
                         : 'theme-body hover:bg-slate-200/60 dark:hover:bg-slate-800/60'
                     }">
-              ${tab.label}
+              ${tab.iconImg ? `<img src="${tab.iconImg}" alt="${tab.label}" class="w-4 h-4 rounded object-cover shrink-0">` : ''}
+              <span>${tab.label}</span>
             </button>
           `;
         }).join('')}
@@ -836,12 +850,13 @@ function renderStoreView(container) {
           const isActive = State.storeFilter === tab.id;
           return `
             <button onclick="setStoreFilter('${tab.id}')"
-                    class="px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shrink-0 spring-press transition-all ${
+                    class="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shrink-0 spring-press transition-all flex items-center gap-1.5 ${
                       isActive 
                         ? 'theme-pill-active' 
                         : 'theme-pill-inactive'
                     }">
-              ${tab.label}
+              ${tab.iconImg ? `<img src="${tab.iconImg}" alt="${tab.label}" class="w-3.5 h-3.5 rounded object-cover shrink-0">` : ''}
+              <span>${tab.label}</span>
             </button>
           `;
         }).join('')}
@@ -851,22 +866,30 @@ function renderStoreView(container) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         ${filteredProducts.map(item => {
           const isExpanded = State.expandedStoreCard === item.id;
+          const itemLogo = item.game === 'coc' 
+            ? 'images/coc-logo.jpg' 
+            : (item.game === 'pubg' ? 'images/pubg-logo.jpg' : 'images/freefire-logo.webp');
           return `
             <div class="rounded-3xl theme-card border ${isExpanded ? 'border-emerald-500 ring-2 ring-emerald-500/20' : ''} p-5 transition-all">
               
               <!-- Card Header / Summary Trigger -->
               <div onclick="toggleStoreCard('${item.id}')" class="cursor-pointer flex items-center justify-between gap-4">
-                <div class="flex-1">
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-400">
-                      ${item.badge}
-                    </span>
-                    <span class="text-xs theme-muted font-mono">${item.gameName}</span>
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                  <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-700/60 shrink-0 bg-slate-900 hidden sm:block">
+                    <img src="${itemLogo}" alt="${item.gameName}" class="w-full h-full object-cover">
                   </div>
-                  <h3 class="text-base sm:text-lg font-bold theme-title font-gaming leading-tight">
-                    ${item.title}
-                  </h3>
-                  <p class="text-xs theme-body line-clamp-1">${item.subtitle}</p>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                        ${item.badge}
+                      </span>
+                      <span class="text-xs theme-muted font-mono truncate">${item.gameName}</span>
+                    </div>
+                    <h3 class="text-base sm:text-lg font-bold theme-title font-gaming leading-tight truncate">
+                      ${item.title}
+                    </h3>
+                    <p class="text-xs theme-body line-clamp-1">${item.subtitle}</p>
+                  </div>
                 </div>
 
                 <div class="text-right shrink-0">
